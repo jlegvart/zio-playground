@@ -98,12 +98,20 @@ object CopyFile extends ZIOAppDefault {
 
   def inputStream(f: File) =
     ZIO.acquireReleaseWith(ZIO.attemptBlocking(new FileInputStream(f)))(stream =>
-      ZIO.attemptBlocking(stream.close()).orDie
+      ZIO.attemptBlocking(stream.close()).catchAll { throwable =>
+        throwable match {
+          case _ => ZIO.unit
+        }
+      }
     )
 
   def outputStream(f: File) =
     ZIO.acquireReleaseWith(ZIO.attemptBlocking(new FileOutputStream(f)))(stream =>
-      ZIO.attemptBlocking(stream.close()).orDie
+      ZIO.attemptBlocking(stream.close()).catchAll { throwable =>
+        throwable match {
+          case _ => ZIO.unit
+        }
+      }
     )
 
 }
